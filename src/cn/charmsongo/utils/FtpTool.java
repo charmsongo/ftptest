@@ -241,14 +241,9 @@ public class FtpTool {
 
 	public static void main(String[] args) {
 
-		//		TestFileApi m = new TestFileApi("192.168.19.147",21,"tom","tom");
 		FtpTool f = new FtpTool();
-//		System.out.println(f.getFileOne("192.168.19.147",21,"tom","tom","/home/tom/User.txt","F:/User.txt"));
-//		f.putFileTwo("192.168.19.147",21,"tom","tom","/home/tom/User1.txt","F:/User.txt");
 		f.getFilesName("192.168.19.100",21,"administrator","1111", "/");
-//		f.putFileOne("192.168.19.147",211,"tom","tom","/home/tom/User.txt","F:/User.txt");
-//		f.login("192.168.19.147",21,"tom","tom");
-//        boolean rv = f.getFileTwo("192.168.19.100",21,"administrator","Jh-Cs1)2(","/User.txt","F:/User.txt");
+
 	}
 
 }
