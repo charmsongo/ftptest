@@ -8,13 +8,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 
 public class FtpTool {
 
-	//ftp¶ÔÏó
+	//ftpå¯¹è±¡
 	private FTPClient ftp;
 	
 	private InputStream is = null;
@@ -24,7 +25,7 @@ public class FtpTool {
 	
 	
 	/**
-	 * ÑéÖ¤µÇÂ¼
+	 * éªŒè¯ç™»å½•
 	 * @param ip
 	 * @param port
 	 * @param name
@@ -39,6 +40,8 @@ public class FtpTool {
 			if(!ftp.login(name, pwd)){
 				return false;
 			}
+			ftp.enterLocalPassiveMode();//è®¾ç½®ä¸ºè¢«åŠ¨æ¨¡å¼(å¦‚ä¸Šä¼ æ–‡ä»¶å¤¹æˆåŠŸï¼Œä¸èƒ½ä¸Šä¼ æ–‡ä»¶ï¼Œæ³¨é‡Šè¿™è¡Œï¼Œå¦åˆ™æŠ¥é”™refused:connect  )
+			ftp.setFileType(FTP.BINARY_FILE_TYPE);//ä¿®æ”¹ä¸Šä¼ æ–‡ä»¶æ ¼å¼
 			ftp.setCharset(Charset.forName("UTF-8"));
 			ftp.setControlEncoding("UTF-8");
 
@@ -51,12 +54,12 @@ public class FtpTool {
 	
 	 
 	/**
-	 * »ñÈ¡ftpÄ³Ò»ÎÄ¼ş£¨Â·¾¶£©ÏÂµÄÎÄ¼şÃû×Ö,ÓÃÓÚ²é¿´ÎÄ¼şÁĞ±í
+	 * è·å–ftpæŸä¸€æ–‡ä»¶ï¼ˆè·¯å¾„ï¼‰ä¸‹çš„æ–‡ä»¶åå­—,ç”¨äºæŸ¥çœ‹æ–‡ä»¶åˆ—è¡¨
 	 * @param ip
 	 * @param port
 	 * @param name
 	 * @param pwd
-	 * @param remotedir Ô¶³ÌµØÖ·Ä¿Â¼
+	 * @param remotedir è¿œç¨‹åœ°å€ç›®å½•
 	 * @return
 	 */
     public boolean getFilesName(String ip,int port, String name, String pwd, String remotedir) {
@@ -65,9 +68,9 @@ public class FtpTool {
 				return false;
 			}
         	
-            //»ñÈ¡ftpÀïÃæ£¬Ö¸¶¨ÎÄ¼ş¼Ğ ÀïÃæµÄÎÄ¼şÃû×Ö£¬´æÈëÊı×éÖĞ
+            //è·å–ftpé‡Œé¢ï¼ŒæŒ‡å®šæ–‡ä»¶å¤¹ é‡Œé¢çš„æ–‡ä»¶åå­—ï¼Œå­˜å…¥æ•°ç»„ä¸­
             FTPFile[] files = ftp.listFiles(remotedir);
-            //´òÓ¡³öftpÀïÃæ£¬Ö¸¶¨ÎÄ¼ş¼Ğ ÀïÃæµÄÎÄ¼şÃû×Ö
+            //æ‰“å°å‡ºftpé‡Œé¢ï¼ŒæŒ‡å®šæ–‡ä»¶å¤¹ é‡Œé¢çš„æ–‡ä»¶åå­—
             for (int i = 0; i < files.length; i++) {
                 System.out.println(files[i].getName());
             }
@@ -82,23 +85,26 @@ public class FtpTool {
     
     
     /**
-     * ÉÏ´«ÎÄ¼ş ·½·¨Ò»
+     * ä¸Šä¼ æ–‡ä»¶ æ–¹æ³•ä¸€
      * @param ip
      * @param port
      * @param name
      * @param pwd
-     * @param remotepath Ô¶³ÌµØÖ·ÎÄ¼şÂ·¾¶
-     * @param localpath ±¾µØÎÄ¼şÂ·¾¶
+     * @param remotepath è¿œç¨‹åœ°å€æ–‡ä»¶ç›®å½•
+     * @param remotename è¿œç¨‹æ–‡ä»¶å
+     * @param localpath æœ¬åœ°æ–‡ä»¶è·¯å¾„
      * @return
      */
-    public boolean putFileOne(String ip,int port, String name, String pwd,String remotepath,String localpath) {
+    public boolean putFileOne(String ip,int port, String name, String pwd,String remotepath,String remotename ,String localpath) {
+    	System.out.println("FTPåœ°å€ä¿¡æ¯ï¼š-----ip:"+ip+"----port:"+port+"---name:"+name+"---pwd:"+pwd+"---remotepath:"+remotepath+"---remotename:"+remotename+"---localpath:"+localpath);
         try {
         	if(!login(ip, port, name, pwd)){
 				return false;
 			}
-            //½«±¾µØµÄ localpath ÎÄ¼şÉÏ´«µ½ftpµÄ¸ùÄ¿Â¼ÎÄ¼ş¼ĞÏÂÃæ£¬²¢ÖØÃüÃûÎª remotepathÖĞµÄÃû×Ö
-        	 return ftp.storeFile(remotepath, new FileInputStream(new File(localpath)));
-        } catch (IOException e) {
+            //å°†æœ¬åœ°çš„ localpath æ–‡ä»¶ä¸Šä¼ åˆ°ftpçš„æ ¹ç›®å½•æ–‡ä»¶å¤¹ä¸‹é¢ï¼Œå¹¶é‡å‘½åä¸º remotepathä¸­çš„åå­—
+        	ftp.changeWorkingDirectory(remotepath);//è®¾ç½®ä¸Šä¼ è·¯å¾„ -- FTPæœåŠ¡å™¨æ–‡ä»¶ç›®å½•
+        	return ftp.storeFile(remotename, new FileInputStream(new File(localpath)));
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }finally{
@@ -109,30 +115,34 @@ public class FtpTool {
 
     
     /**
-     * ÉÏ´«ÎÄ¼şµÄµÚ¶şÖÖ·½·¨£¬ÓÅ»¯ÁË´«ÊäËÙ¶È
+     * ä¸Šä¼ æ–‡ä»¶çš„ç¬¬äºŒç§æ–¹æ³•ï¼Œä¼˜åŒ–äº†ä¼ è¾“é€Ÿåº¦
      * @param ip
      * @param port
      * @param name
      * @param pwd
-     * @param remotepath Ô¶³ÌµØÖ·ÎÄ¼şÂ·¾¶
-     * @param localpath ±¾µØÎÄ¼şÂ·¾¶
+     * @param remotepath è¿œç¨‹åœ°å€æ–‡ä»¶è·¯å¾„
+     * @param localpath æœ¬åœ°æ–‡ä»¶è·¯å¾„
      * @return
      */
     public boolean putFileTwo(String ip,int port, String name, String pwd,String remotepath,String localpath) {
+    	System.out.println("-----ip:"+ip+"----port:"+port+"---name:"+name+"---pwd:"+pwd+"---remotepath:"+remotepath+"---localpath:"+localpath);
         try {
         	if(!login(ip, port, name, pwd)){
 				return false;
 			}
         	
+//        	 //è¨­ç½®ä¸Šå‚³çš„è·¯å¾‘
+//            ftp.changeWorkingDirectory(remotepath);
             os = ftp.storeFileStream(remotepath);
             fis = new FileInputStream(new File(localpath));
+           
 
             byte[] b = new byte[1024];
             int len = 0;
             while ((len = fis.read(b)) != -1) {
                 os.write(b,0,len);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }finally {
@@ -143,13 +153,13 @@ public class FtpTool {
 
     
     /**
-     * ÏÂÔØÎÄ¼ş ·½·¨Ò»
+     * ä¸‹è½½æ–‡ä»¶ æ–¹æ³•ä¸€
      * @param ip
      * @param port
      * @param name
      * @param pwd
-     * @param remotepath Ô¶³ÌµØÖ·ÎÄ¼şÂ·¾¶
-     * @param localpath ±¾µØÎÄ¼şÂ·¾¶
+     * @param remotepath è¿œç¨‹åœ°å€æ–‡ä»¶è·¯å¾„
+     * @param localpath æœ¬åœ°æ–‡ä»¶è·¯å¾„
      * @return
      */
     public boolean getFileOne(String ip,int port, String name, String pwd,String remotepath,String localpath) {
@@ -158,7 +168,7 @@ public class FtpTool {
 				return false;
 			}
         	
-            //½«ftp×ÊÔ´ÖĞ remotepath ÎÄ¼şÏÂÔØµ½±¾µØÄ¿Â¼ÎÄ¼ş¼ĞÏÂÃæ£¬²¢ÖØÃüÃûÎª localpath ÖĞµÄÃû×Ö
+            //å°†ftpèµ„æºä¸­ remotepath æ–‡ä»¶ä¸‹è½½åˆ°æœ¬åœ°ç›®å½•æ–‡ä»¶å¤¹ä¸‹é¢ï¼Œå¹¶é‡å‘½åä¸º localpath ä¸­çš„åå­—
         	return ftp.retrieveFile(remotepath, new FileOutputStream(new File(localpath)));
         } catch (IOException e) {
             e.printStackTrace();
@@ -171,13 +181,13 @@ public class FtpTool {
 
 	
     /**
-     * ÏÂÔØÎÄ¼şµÄµÚ¶şÖÖ·½·¨£¬ÓÅ»¯ÁË´«ÊäËÙ¶È
+     * ä¸‹è½½æ–‡ä»¶çš„ç¬¬äºŒç§æ–¹æ³•ï¼Œä¼˜åŒ–äº†ä¼ è¾“é€Ÿåº¦
      * @param ip
      * @param port
      * @param name
      * @param pwd
-     * @param remotepath Ô¶³ÌµØÖ·ÎÄ¼şÂ·¾¶
-     * @param localpath  ±¾µØÎÄ¼şÂ·¾¶
+     * @param remotepath è¿œç¨‹åœ°å€æ–‡ä»¶è·¯å¾„
+     * @param localpath  æœ¬åœ°æ–‡ä»¶è·¯å¾„
      * @return
      */
 	public boolean getFileTwo(String ip,int port, String name, String pwd,String remotepath,String localpath) {
