@@ -252,7 +252,7 @@ public class FtpTool {
 	public static void main(String[] args) {
 
 		FtpTool f = new FtpTool();
-		f.getFilesName("192.168.19.100",21,"administrator","1111", "/");
+		f.getFilesName("192.168.2.89",21,"admin","1111", "/");
 
 	}
 
