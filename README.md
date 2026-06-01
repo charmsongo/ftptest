@@ -1,5 +1,5 @@
 # ftptest
-java操作ftp
+java操作ftp，快速上手
 此工具类包含方法：
 1.测试登陆ftp
 2.从ftp服务器下载文件
